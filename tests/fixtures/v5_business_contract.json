@@ -1,0 +1,831 @@
+{
+  "all_outputs": {
+    "backup": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "both": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": []
+    },
+    "link": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "mapping": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "passage": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": []
+    },
+    "processing": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "raw": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "status": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": []
+    },
+    "stocks": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": []
+    },
+    "unknown_scope": [],
+    "vitimap": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": []
+    }
+  },
+  "base": {
+    "backup": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "both": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo A|Parcelle 2|Passage 2"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "link": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "mapping": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "passage": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "processing": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "raw": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "status": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "stocks": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo A|Parcelle 2|Passage 2"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "unknown_scope": [],
+    "vitimap": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo A|Parcelle 2|Passage 2",
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    }
+  },
+  "comparison_counts": {
+    "acquisitions": 2,
+    "changed": 5,
+    "comments": 1,
+    "examined": 19,
+    "passages": 2,
+    "percentage": 26.3,
+    "processing": 5,
+    "relationships": 1
+  },
+  "comparison_details": [
+    {
+      "Acquisition": "DEMO_A_001",
+      "Après": "À déterminer",
+      "Avant": "En cours",
+      "Famille": "Excel · statuts",
+      "Information": "Statut dans le suivi Excel",
+      "Parcelle": "",
+      "Passage": "",
+      "Type": "Acquisition",
+      "Vignoble": "Domaine démo A"
+    },
+    {
+      "Acquisition": "DEMO_A_001",
+      "Après": "Non renseigné",
+      "Avant": "Traitement à vérifier — exemple fictif.",
+      "Famille": "Excel · commentaires",
+      "Information": "Commentaire du suivi Excel",
+      "Parcelle": "",
+      "Passage": "",
+      "Type": "Acquisition",
+      "Vignoble": "Domaine démo A"
+    },
+    {
+      "Acquisition": "DEMO_A_001",
+      "Après": "Oui",
+      "Avant": "Non",
+      "Famille": "NAS · constats",
+      "Information": "Images WEBP",
+      "Parcelle": "",
+      "Passage": "",
+      "Type": "Acquisition",
+      "Vignoble": "Domaine démo A"
+    },
+    {
+      "Acquisition": "",
+      "Après": "Oui",
+      "Avant": "Non",
+      "Famille": "NAS · livrables",
+      "Information": "Vitimap · GeoJSON",
+      "Parcelle": "Parcelle 1",
+      "Passage": "Passage 1",
+      "Type": "Passage",
+      "Vignoble": "Domaine démo A"
+    },
+    {
+      "Acquisition": "",
+      "Après": "Oui",
+      "Avant": "Non",
+      "Famille": "NAS · livrables",
+      "Information": "JSON de stocks",
+      "Parcelle": "Parcelle 1",
+      "Passage": "Passage 1",
+      "Type": "Passage",
+      "Vignoble": "Domaine démo A"
+    },
+    {
+      "Acquisition": "",
+      "Après": "Oui",
+      "Avant": "Non",
+      "Famille": "NAS · livrables",
+      "Information": "Statut non sain détecté",
+      "Parcelle": "Parcelle 1",
+      "Passage": "Passage 1",
+      "Type": "Passage",
+      "Vignoble": "Domaine démo A"
+    },
+    {
+      "Acquisition": "",
+      "Après": "Oui",
+      "Avant": "Non",
+      "Famille": "NAS · livrables",
+      "Information": "Critère technique Vitiparcel satisfait",
+      "Parcelle": "Parcelle 1",
+      "Passage": "Passage 1",
+      "Type": "Passage",
+      "Vignoble": "Domaine démo A"
+    },
+    {
+      "Acquisition": "DEMO_A_004",
+      "Après": "Recensé",
+      "Avant": "Non recensé",
+      "Famille": "Périmètre recensé",
+      "Information": "Présence dans l’état enregistré",
+      "Parcelle": "",
+      "Passage": "",
+      "Type": "Acquisition",
+      "Vignoble": "Domaine démo A"
+    },
+    {
+      "Acquisition": "",
+      "Après": "Recensé",
+      "Avant": "Non recensé",
+      "Famille": "Périmètre recensé",
+      "Information": "Présence dans l’état enregistré",
+      "Parcelle": "Parcelle 4",
+      "Passage": "Passage 4",
+      "Type": "Passage",
+      "Vignoble": "Domaine démo A"
+    },
+    {
+      "Acquisition": "DEMO_A_004",
+      "Après": "Recensé",
+      "Avant": "Non recensé",
+      "Famille": "Rattachements",
+      "Information": "Présence dans l’état enregistré",
+      "Parcelle": "Parcelle 4",
+      "Passage": "Passage 4",
+      "Type": "Rattachement",
+      "Vignoble": "Domaine démo A"
+    }
+  ],
+  "folder_absent": {
+    "backup": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "both": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": []
+    },
+    "link": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "mapping": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "passage": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo A|Parcelle 1|Passage 1",
+        "Domaine démo A|Parcelle 2|Passage 2",
+        "Domaine démo B|Parcelle 5|Passage 5",
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ],
+      "unknown": []
+    },
+    "processing": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "raw": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "status": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": []
+    },
+    "stocks": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": []
+    },
+    "unknown_scope": [],
+    "vitimap": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": []
+    }
+  },
+  "historical_metrics": {
+    "demo_20261015": {
+      "all": 6,
+      "blocked": 0,
+      "map": 0,
+      "outside": 0,
+      "parcel": 0,
+      "production": 4,
+      "review": 2,
+      "test": 2,
+      "treated": 1
+    },
+    "demo_20261019": {
+      "all": 6,
+      "blocked": 0,
+      "map": 1,
+      "outside": 0,
+      "parcel": 1,
+      "production": 4,
+      "review": 2,
+      "test": 2,
+      "treated": 2
+    },
+    "demo_20261021": {
+      "all": 7,
+      "blocked": 1,
+      "map": 1,
+      "outside": 1,
+      "parcel": 1,
+      "production": 4,
+      "review": 2,
+      "test": 2,
+      "treated": 2
+    },
+    "demo_20261022": {
+      "all": 7,
+      "blocked": 1,
+      "map": 1,
+      "outside": 1,
+      "parcel": 1,
+      "production": 4,
+      "review": 2,
+      "test": 2,
+      "treated": 2
+    }
+  },
+  "processing_error": {
+    "backup": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "both": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo A|Parcelle 2|Passage 2"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "link": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "mapping": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "passage": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "processing": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": [
+        "DEMO_A_001",
+        "DEMO_A_002",
+        "DEMO_B_001",
+        "DEMO_B_002"
+      ]
+    },
+    "raw": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "status": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "stocks": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo A|Parcelle 2|Passage 2"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "unknown_scope": [],
+    "vitimap": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo A|Parcelle 2|Passage 2",
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    }
+  },
+  "raw_error": {
+    "backup": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": [
+        "DEMO_A_001",
+        "DEMO_A_002",
+        "DEMO_B_001",
+        "DEMO_B_002"
+      ]
+    },
+    "both": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo A|Parcelle 2|Passage 2"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "link": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "mapping": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "passage": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "processing": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "raw": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": [
+        "DEMO_A_001",
+        "DEMO_A_002",
+        "DEMO_B_001",
+        "DEMO_B_002"
+      ]
+    },
+    "status": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "stocks": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo A|Parcelle 2|Passage 2"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    },
+    "unknown_scope": [],
+    "vitimap": {
+      "eligible": 4,
+      "missing": [
+        "Domaine démo A|Parcelle 2|Passage 2",
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ],
+      "unknown": [
+        "Domaine démo B|Parcelle 5|Passage 5"
+      ]
+    }
+  },
+  "unknown": {
+    "backup": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "both": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": [
+        "Domaine démo A|Parcelle 1|Passage 1",
+        "Domaine démo A|Parcelle 2|Passage 2",
+        "Domaine démo B|Parcelle 5|Passage 5",
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ]
+    },
+    "link": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "mapping": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "passage": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": [
+        "Domaine démo A|Parcelle 1|Passage 1",
+        "Domaine démo A|Parcelle 2|Passage 2",
+        "Domaine démo B|Parcelle 5|Passage 5",
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ]
+    },
+    "processing": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "raw": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "status": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": [
+        "Domaine démo A|Parcelle 1|Passage 1",
+        "Domaine démo A|Parcelle 2|Passage 2",
+        "Domaine démo B|Parcelle 5|Passage 5",
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ]
+    },
+    "stocks": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": [
+        "Domaine démo A|Parcelle 1|Passage 1",
+        "Domaine démo A|Parcelle 2|Passage 2",
+        "Domaine démo B|Parcelle 5|Passage 5",
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ]
+    },
+    "unknown_scope": [],
+    "vitimap": {
+      "eligible": 4,
+      "missing": [],
+      "unknown": [
+        "Domaine démo A|Parcelle 1|Passage 1",
+        "Domaine démo A|Parcelle 2|Passage 2",
+        "Domaine démo B|Parcelle 5|Passage 5",
+        "Domaine démo B|Parcelle 6|Passage 6"
+      ]
+    }
+  },
+  "unknown_scope": {
+    "backup": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "both": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "link": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "mapping": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "passage": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "processing": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "raw": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "status": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "stocks": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "unknown_scope": [
+      "Domaine démo A|Parcelle 1|Passage 1",
+      "Domaine démo A|Parcelle 2|Passage 2",
+      "Domaine démo A|Parcelle 3|Passage 3",
+      "Domaine démo A|Parcelle 4|Passage 4",
+      "Domaine démo B|Parcelle 5|Passage 5",
+      "Domaine démo B|Parcelle 6|Passage 6"
+    ],
+    "vitimap": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    }
+  },
+  "zero_eligible": {
+    "backup": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "both": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "link": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "mapping": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "passage": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "processing": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_A_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "raw": {
+      "eligible": 4,
+      "missing": [
+        "DEMO_B_002"
+      ],
+      "unknown": [
+        "DEMO_B_001"
+      ]
+    },
+    "status": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "stocks": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    },
+    "unknown_scope": [],
+    "vitimap": {
+      "eligible": 0,
+      "missing": [],
+      "unknown": []
+    }
+  }
+}

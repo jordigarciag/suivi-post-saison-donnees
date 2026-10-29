@@ -1,0 +1,85 @@
+# On décrit ici une configuration, pas une preuve que les sources et les services sont déjà prêts.
+# Les chemins et secrets propres au poste restent locaux.
+#
+# config/tracking_files.yml
+
+# On ouvre la section tracking_settings pour regrouper ses réglages.
+tracking_settings:
+  # Nom exact de l'onglet Excel à lire.
+  target_sheet: "Suivi_traitement"
+
+  # Colonnes indispensables dans les fichiers Excel.
+  #
+  # Vineyard est nécessaire pour construire
+  # Acquisition_ID_normalise lorsque le nom du vignoble
+  # n'est pas déjà présent dans Acquisition_ID.
+  required_columns:
+    # On prend en compte le domaine concerné dans cette liste de configuration.
+    - "Vineyard"
+    # On utilise cette colonne pour identifier le domaine ou l’acquisition dans les données de suivi.
+    - "Acquisition_ID"
+
+  # Colonnes attendues dans les Excel, mais dont l'absence
+  # ne doit pas interrompre automatiquement l'ingestion.
+  optional_columns:
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Date"
+    # On prend en compte l’identifiant de parcelle dans cette liste de configuration.
+    - "Parcel_ID"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Commentaires"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Problématique"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Statut_Resolution"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Annotation_rangs"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Construction_JSON_Correction"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Traitement_visuel_images"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Segmentation_images"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "VitiMap"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "VitiParcel"
+
+  # Colonnes dans lesquelles le mot "test" est recherché.
+  test_search_columns:
+    # On prend en compte l’identifiant de parcelle dans cette liste de configuration.
+    - "Parcel_ID"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Commentaires"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Problématique"
+
+  # Colonnes techniques dans lesquelles les valeurs
+  # "en attente" et "autre" sont recherchées.
+  technical_step_columns:
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Annotation_rangs"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Construction_JSON_Correction"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Traitement_visuel_images"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "Segmentation_images"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "VitiMap"
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "VitiParcel"
+
+  # Une acquisition contenant cette valeur dans une colonne
+  # technique est classée dans le périmètre Bloqué,
+  # avec Statut_pipeline = En attente.
+  waiting_values:
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "en attente"
+
+  # Une acquisition contenant cette valeur dans une colonne
+  # technique est classée dans le périmètre Bloqué,
+  # avec Statut_pipeline = Autre.
+  review_values:
+    # On déclare cette valeur dans la liste de règles de la section courante.
+    - "autre"

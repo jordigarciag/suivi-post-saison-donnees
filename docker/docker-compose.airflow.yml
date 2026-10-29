@@ -1,0 +1,273 @@
+# On décrit ici une configuration, pas une preuve que les sources et les services sont déjà prêts.
+# Les chemins et secrets propres au poste restent locaux.
+#
+# Installation locale de développement, séparée du Compose métier.
+name: projet12-airflow
+
+# On nomme une configuration commune Airflow ; les services qui utilisent son ancre en héritent.
+x-airflow-common: &airflow-common
+  # On part de l’image Airflow indiquée ici ; le complément métier ajoute ensuite ses dépendances.
+  image: apache/airflow:3.3.2
+  # On précise l’utilisateur du processus dans le conteneur ; ses droits restent liés aux
+  # permissions des volumes.
+  user: "50000:0"
+  # On fournit les paramètres du processus. Les secrets sont référencés par des variables locales,
+  # pas écrits ici.
+  environment: &airflow-env
+    # LocalExecutor exécute les tâches sur cette installation ; on ne configure pas ici une ferme
+    # de workers distribués.
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    # On borne le nombre de tâches Airflow pouvant s’exécuter en parallèle sur cette installation.
+    AIRFLOW__CORE__PARALLELISM: '2'
+    # On limite le nombre de tâches actives simultanées d’un même DAG.
+    AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: '2'
+    # On choisit le gestionnaire d’authentification de cette installation Airflow.
+    AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+    # On choisit de charger ou non les DAG de démonstration fournis avec Airflow.
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    # On évite qu’un nouveau DAG commence à s’exécuter simplement parce que son fichier est
+    # découvert.
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    # On définit le fuseau par défaut ; les dates doivent rester cohérentes avec le fuseau du
+    # planning du DAG.
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: Europe/Paris
+    # On relie les services à airflow_meta, la base technique des runs et états de tâches, pas aux
+    # résultats métier.
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://airflow_meta:${PROJECT12_AIRFLOW_DB_PASSWORD:?Initialiser le fichier Airflow local}@airflow-postgres:5432/airflow_meta"
+    # On fournit la clé utilisée par Airflow pour certaines données sensibles stockées ; on ne la
+    # publie pas.
+    AIRFLOW__CORE__FERNET_KEY: "${PROJECT12_AIRFLOW_FERNET_KEY:?Cle Airflow manquante}"
+    # On fournit le secret de signature des jetons concernés ; on le garde dans la configuration
+    # locale.
+    AIRFLOW__API_AUTH__JWT_SECRET: "${PROJECT12_AIRFLOW_JWT_SECRET:?Cle JWT manquante}"
+    # On définit l’émetteur attendu pour les jetons de cette installation.
+    AIRFLOW__API_AUTH__JWT_ISSUER: projet12-airflow
+    # On indique l’adresse interne de l’API d’exécution, telle qu’elle est joignable depuis les
+    # services Airflow.
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
+    # On active la sonde de santé du scheduler, distincte de la réussite des traitements métier.
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+    # On limite le nombre de processus utilisés pour analyser les fichiers DAG.
+    AIRFLOW__DAG_PROCESSOR__PARSING_PROCESSES: '1'
+    # On définit le fuseau du processus pour ses usages locaux ; les dates métier conservent leurs
+    # propres règles.
+    TZ: Europe/Paris
+  # On définit ce qui persiste et ce qui est partagé avec le conteneur ; ce n’est pas une copie
+  # automatique de sauvegarde.
+  volumes:
+    # On expose les DAG locaux dans Airflow ; le suffixe ro interdit leur modification via ce montage.
+    - ../dags:/opt/airflow/dags:ro
+    - airflow_logs:/opt/airflow/logs
+  # On encadre les journaux Docker pour éviter une accumulation sans limite des fichiers de
+  # sortie.
+  logging:
+    # On choisit le mécanisme utilisé ici, notamment pour les journaux ou le réseau selon cette
+    # section.
+    driver: json-file
+    # On ouvre la section options pour regrouper ses réglages.
+    options:
+      # On borne la taille d’un fichier de journal Docker avant rotation.
+      max-size: "10m"
+      # On borne le nombre de fichiers de journal conservés par la rotation Docker.
+      max-file: "3"
+  # On exprime une condition de démarrage. Cela ne garantit pas que le service restera disponible
+  # pendant tout le traitement.
+  depends_on: &airflow-depends
+    # On ouvre la section airflow-postgres pour regrouper ses réglages.
+    airflow-postgres:
+      # On impose cet état du service dépendant avant le démarrage ; sa disponibilité ultérieure reste
+      # à surveiller.
+      condition: service_healthy
+    # On ouvre la section airflow-init pour regrouper ses réglages.
+    airflow-init:
+      # On impose cet état du service dépendant avant le démarrage ; sa disponibilité ultérieure reste
+      # à surveiller.
+      condition: service_completed_successfully
+
+# On décrit les services à créer ; leur présence dans le fichier ne signifie pas qu’ils sont démarrés.
+services:
+  # C’est la deuxième base : on y conserve les métadonnées d’Airflow, notamment les runs et les
+  # états des tâches. Les trois couches métier ne sont pas ici.
+  airflow-postgres:
+    # Cette instance utilise PostgreSQL 16 avec l’image Alpine.
+    image: postgres:16-alpine
+    # On fournit les paramètres du processus. Les secrets sont référencés par des variables
+    # locales, pas écrits ici.
+    environment:
+      # On définit le nom de la base lors de l’initialisation d’un volume neuf ; cela ne renomme
+      # pas une base existante.
+      POSTGRES_DB: airflow_meta
+      # On définit le compte initial pour cette instance PostgreSQL.
+      POSTGRES_USER: airflow_meta
+      # On exige un secret local : ce paramètre n’est pas un mot de passe public fourni par le
+      # dépôt.
+      POSTGRES_PASSWORD: "${PROJECT12_AIRFLOW_DB_PASSWORD:?Mot de passe Airflow manquant}"
+    # On définit ce qui persiste et ce qui est partagé avec le conteneur ; ce n’est pas une copie
+    # automatique de sauvegarde.
+    volumes:
+      # On conserve les fichiers de la base dans le volume indiqué pour qu’ils survivent au
+      # remplacement du conteneur.
+      - airflow_postgres_data:/var/lib/postgresql/data
+    # On vérifie un signe de disponibilité du service ; ce contrôle ne prouve pas que tout le
+    # pipeline fonctionne.
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U airflow_meta -d airflow_meta"]
+      # On fixe le délai entre deux sondes de santé ; ce n’est pas la fréquence du pipeline métier.
+      interval: 5s
+      # On limite la durée d’une sonde avant de la considérer en échec.
+      timeout: 5s
+      # On fixe le nombre d’échecs de sonde tolérés ; ce n’est pas un nombre de relances métier.
+      retries: 20
+    # On définit la politique de redémarrage du service, pas une relance des étapes métier déjà
+    # commises.
+    restart: unless-stopped
+    # On encadre les journaux Docker pour éviter une accumulation sans limite des fichiers de
+    # sortie.
+    logging:
+      # On choisit le mécanisme utilisé ici, notamment pour les journaux ou le réseau selon cette
+      # section.
+      driver: json-file
+      # On ouvre la section options pour regrouper ses réglages.
+      options:
+        # On borne la taille d’un fichier de journal Docker avant rotation.
+        max-size: "10m"
+        # On borne le nombre de fichiers de journal conservés par la rotation Docker.
+        max-file: "3"
+
+  # On prépare l’installation initiale et les migrations Airflow ; on n’y charge pas les
+  # observations métier.
+  airflow-init:
+    # On reprend la configuration de cette ancre YAML, puis on applique les réglages propres à ce
+    # service.
+    <<: *airflow-common
+    # On précise l’utilisateur du processus dans le conteneur ; ses droits restent liés aux
+    # permissions des volumes.
+    user: "0:0"
+    # On choisit le programme qui recevra la commande du service.
+    entrypoint: /bin/bash
+    # On précise la commande de démarrage ; le même environnement peut être utilisé avec des
+    # commandes différentes.
+    command:
+      - -c
+      # Le bloc suivant contient les commandes exécutées telles quelles : on s’arrête sur erreur, on
+      # prépare les répertoires et leurs droits, puis on passe la main au programme indiqué.
+      - |
+        set -e
+        mkdir -p /opt/airflow/logs
+        chown -R 50000:0 /opt/airflow/logs
+        exec /entrypoint airflow version
+    # On fournit les paramètres du processus. Les secrets sont référencés par des variables
+    # locales, pas écrits ici.
+    environment:
+      # On reprend la configuration de cette ancre YAML, puis on applique les réglages propres à ce
+      # service.
+      <<: *airflow-env
+      # On fournit les migrations de la base technique Airflow au script d’initialisation.
+      _AIRFLOW_DB_MIGRATE: 'true'
+      # On fournit la création du compte d’interface au script d’initialisation.
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      # On fournit le nom du compte d’interface au script d’initialisation.
+      _AIRFLOW_WWW_USER_USERNAME: projet12
+      # On fournit le secret local du compte d’interface au script d’initialisation.
+      _AIRFLOW_WWW_USER_PASSWORD: "${PROJECT12_AIRFLOW_UI_PASSWORD:?Mot de passe interface manquant}"
+    # On exprime une condition de démarrage. Cela ne garantit pas que le service restera
+    # disponible pendant tout le traitement.
+    depends_on:
+      # On ouvre la section airflow-postgres pour regrouper ses réglages.
+      airflow-postgres:
+        # On impose cet état du service dépendant avant le démarrage ; sa disponibilité ultérieure
+        # reste à surveiller.
+        condition: service_healthy
+    # On définit la politique de redémarrage du service, pas une relance des étapes métier déjà
+    # commises.
+    restart: 'no'
+
+  # On expose les fonctions de l’API et de l’interface Airflow sur le port prévu.
+  airflow-apiserver:
+    # On reprend la configuration de cette ancre YAML, puis on applique les réglages propres à ce
+    # service.
+    <<: *airflow-common
+    # On précise la commande de démarrage ; le même environnement peut être utilisé avec des
+    # commandes différentes.
+    command: api-server
+    # On publie les ports indiqués. Une liaison à 127.0.0.1 limite cette publication au poste
+    # local.
+    ports:
+      # On publie ce port uniquement sur la boucle locale du poste, pas sur toutes ses interfaces
+      # réseau.
+      - "127.0.0.1:8080:8080"
+    # On vérifie un signe de disponibilité du service ; ce contrôle ne prouve pas que tout le
+    # pipeline fonctionne.
+    healthcheck:
+      test: [CMD, curl, --fail, http://localhost:8080/api/v2/monitor/health]
+      # On fixe le délai entre deux sondes de santé ; ce n’est pas la fréquence du pipeline métier.
+      interval: 30s
+      # On limite la durée d’une sonde avant de la considérer en échec.
+      timeout: 10s
+      # On fixe le nombre d’échecs de sonde tolérés ; ce n’est pas un nombre de relances métier.
+      retries: 10
+      # On laisse cette période de démarrage avant de comptabiliser les échecs de la sonde comme prévu
+      # par Docker.
+      start_period: 60s
+    # On définit la politique de redémarrage du service, pas une relance des étapes métier déjà
+    # commises.
+    restart: unless-stopped
+
+  # On confie au scheduler le planning et la mise en exécution des tâches. Ce n’est pas le
+  # dashboard qui déclenche le scan.
+  airflow-scheduler:
+    # On reprend la configuration de cette ancre YAML, puis on applique les réglages propres à ce
+    # service.
+    <<: *airflow-common
+    # On précise la commande de démarrage ; le même environnement peut être utilisé avec des
+    # commandes différentes.
+    command: scheduler
+    # On vérifie un signe de disponibilité du service ; ce contrôle ne prouve pas que tout le
+    # pipeline fonctionne.
+    healthcheck:
+      test: [CMD-SHELL, 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      # On fixe le délai entre deux sondes de santé ; ce n’est pas la fréquence du pipeline métier.
+      interval: 30s
+      # On limite la durée d’une sonde avant de la considérer en échec.
+      timeout: 30s
+      # On fixe le nombre d’échecs de sonde tolérés ; ce n’est pas un nombre de relances métier.
+      retries: 10
+      # On laisse cette période de démarrage avant de comptabiliser les échecs de la sonde comme prévu
+      # par Docker.
+      start_period: 60s
+    # On définit la politique de redémarrage du service, pas une relance des étapes métier déjà
+    # commises.
+    restart: unless-stopped
+
+  # On fait analyser les fichiers de DAG pour qu’Airflow connaisse leurs définitions.
+  airflow-dag-processor:
+    # On reprend la configuration de cette ancre YAML, puis on applique les réglages propres à ce
+    # service.
+    <<: *airflow-common
+    # On précise la commande de démarrage ; le même environnement peut être utilisé avec des
+    # commandes différentes.
+    command: dag-processor
+    # On vérifie un signe de disponibilité du service ; ce contrôle ne prouve pas que tout le
+    # pipeline fonctionne.
+    healthcheck:
+      test: [CMD-SHELL, 'airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"']
+      # On fixe le délai entre deux sondes de santé ; ce n’est pas la fréquence du pipeline métier.
+      interval: 30s
+      # On limite la durée d’une sonde avant de la considérer en échec.
+      timeout: 10s
+      # On fixe le nombre d’échecs de sonde tolérés ; ce n’est pas un nombre de relances métier.
+      retries: 10
+      # On laisse cette période de démarrage avant de comptabiliser les échecs de la sonde comme prévu
+      # par Docker.
+      start_period: 60s
+    # On définit la politique de redémarrage du service, pas une relance des étapes métier déjà
+    # commises.
+    restart: unless-stopped
+
+# On définit ce qui persiste et ce qui est partagé avec le conteneur ; ce n’est pas une copie
+# automatique de sauvegarde.
+volumes:
+  # On ouvre la section airflow_postgres_data pour regrouper ses réglages.
+  airflow_postgres_data:
+  # On ouvre la section airflow_logs pour regrouper ses réglages.
+  airflow_logs:

@@ -1,0 +1,65 @@
+# On décrit ici une configuration, pas une preuve que les sources et les services sont déjà prêts.
+# Les chemins et secrets propres au poste restent locaux.
+#
+name: projet12-suivi
+
+# On décrit les services à créer ; leur présence dans le fichier ne signifie pas qu’ils sont démarrés.
+services:
+  # On héberge la base métier suivi_acquisitions : données Excel, observations, rapprochements et
+  # journal métier.
+  postgres:
+    # Cette instance utilise PostgreSQL 16 avec l’image Alpine.
+    image: postgres:16-alpine
+    # On fournit les paramètres du processus. Les secrets sont référencés par des variables
+    # locales, pas écrits ici.
+    environment:
+      # On définit le nom de la base lors de l’initialisation d’un volume neuf ; cela ne renomme
+      # pas une base existante.
+      POSTGRES_DB: suivi_acquisitions
+      # On définit le compte initial pour cette instance PostgreSQL.
+      POSTGRES_USER: projet12_admin
+      # On exige un secret local : ce paramètre n’est pas un mot de passe public fourni par le
+      # dépôt.
+      POSTGRES_PASSWORD: ${PROJECT12_POSTGRES_PASSWORD:?Mot de passe manquant}
+    # On publie les ports indiqués. Une liaison à 127.0.0.1 limite cette publication au poste
+    # local.
+    ports:
+      # On publie ce port uniquement sur la boucle locale du poste, pas sur toutes ses interfaces
+      # réseau.
+      - "127.0.0.1:5433:5432"
+    # On définit ce qui persiste et ce qui est partagé avec le conteneur ; ce n’est pas une copie
+    # automatique de sauvegarde.
+    volumes:
+      # On conserve les fichiers de la base dans le volume indiqué pour qu’ils survivent au
+      # remplacement du conteneur.
+      - postgres_data:/var/lib/postgresql/data
+    # On vérifie un signe de disponibilité du service ; ce contrôle ne prouve pas que tout le
+    # pipeline fonctionne.
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U projet12_admin -d suivi_acquisitions
+      # On fixe le délai entre deux sondes de santé ; ce n’est pas la fréquence du pipeline métier.
+      interval: 5s
+      # On limite la durée d’une sonde avant de la considérer en échec.
+      timeout: 5s
+      # On fixe le nombre d’échecs de sonde tolérés ; ce n’est pas un nombre de relances métier.
+      retries: 12
+    # On encadre les journaux Docker pour éviter une accumulation sans limite des fichiers de
+    # sortie.
+    logging:
+      # On choisit le mécanisme utilisé ici, notamment pour les journaux ou le réseau selon cette
+      # section.
+      driver: json-file
+      # On ouvre la section options pour regrouper ses réglages.
+      options:
+        # On borne la taille d’un fichier de journal Docker avant rotation.
+        max-size: "10m"
+        # On borne le nombre de fichiers de journal conservés par la rotation Docker.
+        max-file: "3"
+
+# On définit ce qui persiste et ce qui est partagé avec le conteneur ; ce n’est pas une copie
+# automatique de sauvegarde.
+volumes:
+  # On ouvre la section postgres_data pour regrouper ses réglages.
+  postgres_data:

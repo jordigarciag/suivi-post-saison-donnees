@@ -1,0 +1,9 @@
+# On décrit les dépendances installées par pip. Une plage de versions laisse une marge de
+# résolution ; elle ne garantit pas une installation identique à chaque date. Une ligne -r
+# réutilise une autre liste.
+# Dépendances nécessaires au code et à la démonstration locale.
+-r app/requirements-dashboard.txt
+# On lit les classeurs Excel .xlsx sans dépendre d’une installation d’Excel.
+openpyxl>=3.1,<4
+# On lit les fichiers YAML qui décrivent les règles et les chemins configurables.
+PyYAML>=6,<7

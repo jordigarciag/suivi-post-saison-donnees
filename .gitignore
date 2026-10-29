@@ -1,0 +1,23 @@
+# Configuration locale et secrets : ne jamais les publier.
+.env
+.env.*
+!.env.example
+!*.env.example
+config/*.local.yml
+# Sources et résultats locaux, exclus même lorsqu’ils sont utiles au travail.
+data/
+logs/
+state/
+backups/
+*.zip
+*.dump
+*.backup
+# Environnements et caches.
+.venv*/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+playwright-report/
+test-results/
+# Un fichier déjà suivi par Git n’est pas protégé par cette liste.

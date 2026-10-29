@@ -1,0 +1,203 @@
+# On décrit ici une configuration, pas une preuve que les sources et les services sont déjà prêts.
+# Les chemins et secrets propres au poste restent locaux.
+#
+# QUATRIEME complement ; conserver les trois fichiers Airflow existants.
+# Sources definies localement ; jamais de credentials SMB dans ce fichier.
+
+# On regroupe les variables du workflow sous une ancre réutilisable par les services concernés.
+x-workflow-environment: &workflow-environment
+  # On marque le contexte Docker attendu par les contrôles du workflow.
+  PROJECT12_WORKFLOW_DOCKER: "1"
+  # On transmet l’identité du partage d’état qui doit être commune aux services du workflow.
+  PROJECT12_WORKFLOW_SHARE_ID: "${PROJECT12_WORKFLOW_SHARE_ID:?Preparer le partage workflow}"
+  # On choisit la source explicite des réglages NAS au lieu d’un .env chargé implicitement.
+  PROJECT12_NAS_CONNECTION_MODE: environment
+  # On indique le chemin des images brutes tel qu’il est vu depuis le conteneur.
+  NAS_BRUT_ROOT: /opt/nas/brute_v2025
+  # On indique le chemin des résultats de traitement dans le conteneur.
+  NAS_PROCESSING_ROOT: /opt/nas/data_processing_2025
+  # On demande à Python d’utiliser son mode UTF-8 pour ne pas dépendre de l’encodage implicite du
+  # système.
+  PYTHONUTF8: "1"
+  # On évite les fichiers .pyc dans les sources montées, notamment lorsqu’elles sont en lecture seule.
+  PYTHONDONTWRITEBYTECODE: "1"
+
+# On regroupe les montages du workflow ; chaque source garde ensuite ses propres droits.
+x-workflow-volumes: &workflow-volumes
+  # Le type bind relie un emplacement hôte au conteneur ; ce n’est pas une copie de ses fichiers.
+  - type: bind
+    # On indique le chemin du côté hôte, à distinguer du chemin target vu dans le conteneur.
+    source: ../src
+    # On fixe le chemin visible à l’intérieur du conteneur ; le programme doit utiliser ce chemin-là.
+    target: /opt/project/src
+    # On impose la lecture seule à ce niveau ; les autres montages gardent leurs propres options.
+    read_only: true
+    # On précise les règles propres au montage de ce chemin hôte.
+    bind:
+      # On refuse la création silencieuse d’un chemin hôte manquant, qui pourrait masquer une
+      # mauvaise configuration.
+      create_host_path: false
+
+  # Le type bind relie un emplacement hôte au conteneur ; ce n’est pas une copie de ses fichiers.
+  - type: bind
+    # On indique le chemin du côté hôte, à distinguer du chemin target vu dans le conteneur.
+    source: ../scripts
+    # On fixe le chemin visible à l’intérieur du conteneur ; le programme doit utiliser ce chemin-là.
+    target: /opt/project/scripts
+    # On impose la lecture seule à ce niveau ; les autres montages gardent leurs propres options.
+    read_only: true
+    # On précise les règles propres au montage de ce chemin hôte.
+    bind:
+      # On refuse la création silencieuse d’un chemin hôte manquant, qui pourrait masquer une
+      # mauvaise configuration.
+      create_host_path: false
+
+  # Le type bind relie un emplacement hôte au conteneur ; ce n’est pas une copie de ses fichiers.
+  - type: bind
+    # On indique le chemin du côté hôte, à distinguer du chemin target vu dans le conteneur.
+    source: ../config/tracking_files.yml
+    # On fixe le chemin visible à l’intérieur du conteneur ; le programme doit utiliser ce chemin-là.
+    target: /opt/project/config/tracking_files.yml
+    # On impose la lecture seule à ce niveau ; les autres montages gardent leurs propres options.
+    read_only: true
+    # On précise les règles propres au montage de ce chemin hôte.
+    bind:
+      # On refuse la création silencieuse d’un chemin hôte manquant, qui pourrait masquer une
+      # mauvaise configuration.
+      create_host_path: false
+
+  # Le type bind relie un emplacement hôte au conteneur ; ce n’est pas une copie de ses fichiers.
+  - type: bind
+    # On indique le chemin du côté hôte, à distinguer du chemin target vu dans le conteneur.
+    source: ../data
+    # On fixe le chemin visible à l’intérieur du conteneur ; le programme doit utiliser ce chemin-là.
+    target: /opt/project/data
+    # On précise les règles propres au montage de ce chemin hôte.
+    bind:
+      # On refuse la création silencieuse d’un chemin hôte manquant, qui pourrait masquer une
+      # mauvaise configuration.
+      create_host_path: false
+
+  # Le type bind relie un emplacement hôte au conteneur ; ce n’est pas une copie de ses fichiers.
+  - type: bind
+    # On indique le chemin du côté hôte, à distinguer du chemin target vu dans le conteneur.
+    source: ../data/01_incoming/suivi_acquisitions
+    # On fixe le chemin visible à l’intérieur du conteneur ; le programme doit utiliser ce chemin-là.
+    target: /opt/project/data/01_incoming/suivi_acquisitions
+    # On impose la lecture seule à ce niveau ; les autres montages gardent leurs propres options.
+    read_only: true
+    # On précise les règles propres au montage de ce chemin hôte.
+    bind:
+      # On refuse la création silencieuse d’un chemin hôte manquant, qui pourrait masquer une
+      # mauvaise configuration.
+      create_host_path: false
+
+  # Le type bind relie un emplacement hôte au conteneur ; ce n’est pas une copie de ses fichiers.
+  - type: bind
+    # On indique le chemin du côté hôte, à distinguer du chemin target vu dans le conteneur.
+    source: ../state
+    # On fixe le chemin visible à l’intérieur du conteneur ; le programme doit utiliser ce chemin-là.
+    target: /opt/project/state
+    # On précise les règles propres au montage de ce chemin hôte.
+    bind:
+      # On refuse la création silencieuse d’un chemin hôte manquant, qui pourrait masquer une
+      # mauvaise configuration.
+      create_host_path: false
+
+  # Le type bind relie un emplacement hôte au conteneur ; ce n’est pas une copie de ses fichiers.
+  - type: bind
+    # On indique le chemin du côté hôte, à distinguer du chemin target vu dans le conteneur.
+    source: ../logs
+    # On fixe le chemin visible à l’intérieur du conteneur ; le programme doit utiliser ce chemin-là.
+    target: /opt/project/logs
+    # On précise les règles propres au montage de ce chemin hôte.
+    bind:
+      # On refuse la création silencieuse d’un chemin hôte manquant, qui pourrait masquer une
+      # mauvaise configuration.
+      create_host_path: false
+
+  # Monter la racine du partage NAS en lecture seule.
+  # Les sous-dossiers sont accessibles sous :
+  # /opt/nas/brute_v2025
+  # /opt/nas/data_processing_2025
+  - type: bind
+    # On monte une racine NAS commune : ses sous-dossiers seront accessibles sous /opt/nas.
+    source: "${PROJECT12_WORKFLOW_NAS_SOURCE:?Chemin NAS requis}"
+    # On fixe le chemin visible à l’intérieur du conteneur ; le programme doit utiliser ce chemin-là.
+    target: /opt/nas
+    # On impose la lecture seule à ce niveau ; les autres montages gardent leurs propres options.
+    read_only: true
+    # On précise les règles propres au montage de ce chemin hôte.
+    bind:
+      # On refuse la création silencieuse d’un chemin hôte manquant, qui pourrait masquer une
+      # mauvaise configuration.
+      create_host_path: false
+
+# On décrit les services à créer ; leur présence dans le fichier ne signifie pas qu’ils sont démarrés.
+services:
+  # On confie au scheduler le planning et la mise en exécution des tâches. Ce n’est pas le
+  # dashboard qui déclenche le scan.
+  airflow-scheduler:
+    # On fournit les paramètres du processus. Les secrets sont référencés par des variables
+    # locales, pas écrits ici.
+    environment: *workflow-environment
+    # On définit ce qui persiste et ce qui est partagé avec le conteneur ; ce n’est pas une copie
+    # automatique de sauvegarde.
+    volumes: *workflow-volumes
+
+  # On fournit le diagnostic du parcours pilote dans un conteneur éphémère prévu pour ce contrôle.
+  airflow-workflow-check:
+    # On réserve ce service à un lancement explicite du profil concerné.
+    profiles: [workflow-diagnostic]
+    # Cette image Airflow inclut les dépendances Python du projet.
+    image: projet12-airflow-business:3.3.2-v1
+    # On précise l’utilisateur du processus dans le conteneur ; ses droits restent liés aux
+    # permissions des volumes.
+    user: "50000:0"
+    # On choisit le programme qui recevra la commande du service.
+    entrypoint: [python]
+    # On précise la commande de démarrage ; le même environnement peut être utilisé avec des
+    # commandes différentes.
+    command:
+      # On transmet cet argument au programme de diagnostic défini par le service.
+      - /opt/project/scripts/run_airflow_pilote_workflow.py
+      # On transmet cet argument au programme de diagnostic défini par le service.
+      - --diagnostic-only
+    # On fixe le dossier courant du programme dans le conteneur, indépendamment du terminal hôte.
+    working_dir: /opt/project
+    # On lit le fichier local de variables nécessaire à ce service ; il reste exclu du dépôt.
+    env_file:
+      # On désigne le fichier local référencé par cette configuration ; les secrets doivent rester
+      # hors du dépôt.
+      - path: ../.env.airflow.import.local
+        # Le mode raw évite que les caractères du mot de passe soient réinterprétés comme des
+        # variables Compose.
+        format: raw
+    # On fournit les paramètres du processus. Les secrets sont référencés par des variables
+    # locales, pas écrits ici.
+    environment: *workflow-environment
+    # On définit ce qui persiste et ce qui est partagé avec le conteneur ; ce n’est pas une copie
+    # automatique de sauvegarde.
+    volumes: *workflow-volumes
+    # On raccorde ce service aux réseaux indiqués ci-dessous.
+    networks: [business-import]
+    # On impose la lecture seule à ce niveau ; les autres montages gardent leurs propres options.
+    read_only: true
+    # On prévoit un espace temporaire en mémoire pour les écritures autorisées ; il ne remplace
+    # pas un volume persistant.
+    tmpfs:
+      # On déclare cette valeur dans la liste de règles de la section courante.
+      - "/tmp:rw,nosuid,nodev,size=128m,mode=1777"
+    # On retire les capacités Linux indiquées pour réduire les privilèges du processus.
+    cap_drop: [ALL]
+    # On ajoute les restrictions précisées pour le conteneur, sans en faire une garantie de
+    # sécurité complète.
+    security_opt:
+      - no-new-privileges:true
+    # On fixe une limite de mémoire ; la dépasser peut interrompre le processus.
+    mem_limit: 512m
+    # On limite la part de CPU autorisée à ce service.
+    cpus: 1.0
+    # On définit la politique de redémarrage du service, pas une relance des étapes métier déjà
+    # commises.
+    restart: "no"

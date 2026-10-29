@@ -1,0 +1,14 @@
+# On décrit les dépendances installées par pip. Une plage de versions laisse une marge de
+# résolution ; elle ne garantit pas une installation identique à chaque date. Une ligne -r
+# réutilise une autre liste.
+# Dépendances métier compatibles avec les contraintes Airflow 3.3.2 / Python 3.13.
+# Fichier séparé : ne remplace pas requirements.txt du venv Windows.
+pandas==3.0.5
+# On lit les classeurs Excel .xlsx sans dépendre d’une installation d’Excel.
+openpyxl==3.1.5
+# On lit les fichiers YAML qui décrivent les règles et les chemins configurables.
+PyYAML==6.0.3
+# On utilise le pilote PostgreSQL avec ses composants binaires pour les connexions SQL.
+psycopg[binary]==3.3.5
+# On lit la configuration locale quand ce mode est explicitement choisi.
+python-dotenv==1.2.3

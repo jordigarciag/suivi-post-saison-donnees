@@ -1,0 +1,15 @@
+# On commence par tout exclure du contexte de construction.
+# Les lignes avec ! réintroduisent seulement les fichiers nécessaires à cette image.
+# Cela évite notamment de copier par erreur des sources et configurations locales.
+# Contexte limité à cette image, sans changer les autres builds.
+*
+# On réautorise ce fichier précis dans le contexte, après l’exclusion générale ci-dessus.
+!Dockerfile.airflow-business
+# On réautorise ce fichier précis dans le contexte, après l’exclusion générale ci-dessus.
+!Dockerfile.airflow-business.dockerignore
+# On réautorise ce fichier précis dans le contexte, après l’exclusion générale ci-dessus.
+!requirements.airflow-business.txt
+# On réautorise ce fichier précis dans le contexte, après l’exclusion générale ci-dessus.
+!constraints-airflow-3.3.2-python3.13.txt
+# On réautorise ce fichier précis dans le contexte, après l’exclusion générale ci-dessus.
+!run_excel_tests_isolated.py

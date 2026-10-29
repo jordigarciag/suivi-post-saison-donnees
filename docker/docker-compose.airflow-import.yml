@@ -1,0 +1,107 @@
+# On décrit ici une configuration, pas une preuve que les sources et les services sont déjà prêts.
+# Les chemins et secrets propres au poste restent locaux.
+#
+# Diagnostic temporaire et controle manuel depuis Airflow.
+# Seul le scheduler (LocalExecutor) recoit la connexion importeur.
+# A combiner apres airflow.yml et airflow-business.yml, avec les trois -f.
+services:
+  # On confie au scheduler le planning et la mise en exécution des tâches. Ce n’est pas le
+  # dashboard qui déclenche le scan.
+  airflow-scheduler:
+    # On lit le fichier local de variables nécessaire à ce service ; il reste exclu du dépôt.
+    env_file:
+      # On désigne le fichier local référencé par cette configuration ; les secrets doivent rester
+      # hors du dépôt.
+      - path: ../.env.airflow.import.local
+        # Le mode raw évite que les caractères du mot de passe soient réinterprétés comme des
+        # variables Compose.
+        format: raw
+    # On définit ce qui persiste et ce qui est partagé avec le conteneur ; ce n’est pas une copie
+    # automatique de sauvegarde.
+    volumes:
+      - ../scripts:/opt/project/scripts:ro
+    # On raccorde ce service aux réseaux indiqués ci-dessous.
+    networks:
+      - default
+      - business-import
+
+  # On fournit un diagnostic explicite de la connexion importeur, distinct d’un lancement du
+  # workflow.
+  import-connection-check:
+    # On réserve ce service à un lancement explicite du profil concerné.
+    profiles: [diagnostic]
+    # Cette image Airflow inclut les dépendances Python du projet.
+    image: projet12-airflow-business:3.3.2-v1
+    # On précise l’utilisateur du processus dans le conteneur ; ses droits restent liés aux
+    # permissions des volumes.
+    user: "50000:0"
+    # On choisit le programme qui recevra la commande du service.
+    entrypoint: [python]
+    # On précise la commande de démarrage ; le même environnement peut être utilisé avec des
+    # commandes différentes.
+    command: [/opt/project/scripts/check_import_connection.py, --project-root, /opt/project]
+    # On fixe le dossier courant du programme dans le conteneur, indépendamment du terminal hôte.
+    working_dir: /opt/project
+    # On lit le fichier local de variables nécessaire à ce service ; il reste exclu du dépôt.
+    env_file:
+      # On désigne le fichier local référencé par cette configuration ; les secrets doivent rester
+      # hors du dépôt.
+      - path: ../.env.airflow.import.local
+        # Le mode raw évite que les caractères du mot de passe soient réinterprétés comme des
+        # variables Compose.
+        format: raw
+    # On fournit les paramètres du processus. Les secrets sont référencés par des variables
+    # locales, pas écrits ici.
+    environment:
+      # On demande à Python d’utiliser son mode UTF-8 pour ne pas dépendre de l’encodage implicite du
+      # système.
+      PYTHONUTF8: "1"
+      # On évite les fichiers .pyc dans les sources montées, notamment lorsqu’elles sont en lecture
+      # seule.
+      PYTHONDONTWRITEBYTECODE: "1"
+    # On définit ce qui persiste et ce qui est partagé avec le conteneur ; ce n’est pas une copie
+    # automatique de sauvegarde.
+    volumes:
+      - ../scripts:/opt/project/scripts:ro
+    # On raccorde ce service aux réseaux indiqués ci-dessous.
+    networks:
+      - business-import
+    # On impose la lecture seule à ce niveau ; les autres montages gardent leurs propres options.
+    read_only: true
+    # On prévoit un espace temporaire en mémoire pour les écritures autorisées ; il ne remplace
+    # pas un volume persistant.
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+    # On retire les capacités Linux indiquées pour réduire les privilèges du processus.
+    cap_drop: [ALL]
+    # On ajoute les restrictions précisées pour le conteneur, sans en faire une garantie de
+    # sécurité complète.
+    security_opt:
+      - no-new-privileges:true
+    # On limite la part de CPU autorisée à ce service.
+    cpus: 1.0
+    # On fixe une limite de mémoire ; la dépasser peut interrompre le processus.
+    mem_limit: 256m
+    # On définit la politique de redémarrage du service, pas une relance des étapes métier déjà
+    # commises.
+    restart: "no"
+    # On encadre les journaux Docker pour éviter une accumulation sans limite des fichiers de
+    # sortie.
+    logging:
+      # On choisit le mécanisme utilisé ici, notamment pour les journaux ou le réseau selon cette
+      # section.
+      driver: json-file
+      # On ouvre la section options pour regrouper ses réglages.
+      options:
+        # On borne la taille d’un fichier de journal Docker avant rotation.
+        max-size: "10m"
+        # On borne le nombre de fichiers de journal conservés par la rotation Docker.
+        max-file: "1"
+# On raccorde ce service aux réseaux indiqués ci-dessous.
+networks:
+  # On ouvre la section business-import pour regrouper ses réglages.
+  business-import:
+    # On précise si cette ressource doit déjà exister en dehors du projet Compose.
+    external: true
+    # On fixe le nom du projet Compose pour distinguer ses ressources de celles d’un autre assemblage.
+    name: projet12-suivi_default

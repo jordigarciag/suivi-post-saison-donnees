@@ -1,0 +1,8 @@
+# On décrit les dépendances installées par pip. Une plage de versions laisse une marge de
+# résolution ; elle ne garantit pas une installation identique à chaque date. Une ligne -r
+# réutilise une autre liste.
+-r requirements.txt
+# On lance les tests Python et on vérifie les résultats sans exécuter les parcours métier réels.
+pytest>=8,<9
+# On pilote le navigateur de test pour contrôler les interactions du dashboard.
+playwright>=1.50,<2

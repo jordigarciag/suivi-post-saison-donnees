@@ -1,0 +1,37 @@
+# On décrit ici une configuration, pas une preuve que les sources et les services sont déjà prêts.
+# Les chemins et secrets propres au poste restent locaux.
+#
+# Complément du Compose Airflow existant, pas un fichier autonome.
+# Utiliser les deux -f dans l'ordre indiqué dans la documentation.
+x-business-service: &business-service
+  # Cette image Airflow inclut les dépendances Python du projet.
+  image: projet12-airflow-business:3.3.2-v1
+  # On définit ce qui persiste et ce qui est partagé avec le conteneur ; ce n’est pas une copie
+  # automatique de sauvegarde.
+  volumes:
+    - ../src:/opt/project/src:ro
+    - ../tests/unit:/opt/project/tests:ro
+
+# On décrit les services à créer ; leur présence dans le fichier ne signifie pas qu’ils sont démarrés.
+services:
+  # On prépare l’installation initiale et les migrations Airflow ; on n’y charge pas les
+  # observations métier.
+  airflow-init:
+    # Cette image Airflow inclut les dépendances Python du projet.
+    image: projet12-airflow-business:3.3.2-v1
+  # On expose les fonctions de l’API et de l’interface Airflow sur le port prévu.
+  airflow-apiserver:
+    # On reprend la configuration de cette ancre YAML, puis on applique les réglages propres à ce
+    # service.
+    <<: *business-service
+  # On confie au scheduler le planning et la mise en exécution des tâches. Ce n’est pas le
+  # dashboard qui déclenche le scan.
+  airflow-scheduler:
+    # On reprend la configuration de cette ancre YAML, puis on applique les réglages propres à ce
+    # service.
+    <<: *business-service
+  # On fait analyser les fichiers de DAG pour qu’Airflow connaisse leurs définitions.
+  airflow-dag-processor:
+    # On reprend la configuration de cette ancre YAML, puis on applique les réglages propres à ce
+    # service.
+    <<: *business-service

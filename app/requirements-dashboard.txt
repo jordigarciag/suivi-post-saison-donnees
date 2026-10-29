@@ -1,0 +1,15 @@
+# On décrit les dépendances installées par pip. Une plage de versions laisse une marge de
+# résolution ; elle ne garantit pas une installation identique à chaque date. Une ligne -r
+# réutilise une autre liste.
+dash>=2.18,<3
+# On utilise pandas pour préparer, filtrer et agréger les tableaux de données.
+pandas>=2.0,<3
+# On utilise Plotly pour les graphiques du dashboard.
+plotly>=5.0,<6
+# On utilise le pilote PostgreSQL avec ses composants binaires pour les connexions SQL.
+psycopg[binary]>=3.1,<4
+# On lit la configuration locale quand ce mode est explicitement choisi.
+python-dotenv>=1.0,<2
+
+# On fournit les règles de fuseau horaire sur les systèmes qui ne disposent pas de cette base.
+tzdata>=2024.1

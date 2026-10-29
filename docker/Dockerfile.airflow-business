@@ -1,0 +1,27 @@
+# On part de l’image Airflow indiquée plutôt que reconstruire tout son environnement depuis zéro.
+FROM apache/airflow:3.3.2
+# On change l’utilisateur pour les instructions suivantes ; les installations et le lancement
+# n’ont pas nécessairement besoin des mêmes droits.
+USER airflow
+# On copie uniquement les fichiers indiqués dans l’image ; le filtrage du contexte évite d’y
+# envoyer tout le projet.
+# On embarque la liste courte des dépendances métier à installer dans cette image.
+COPY --chown=airflow:root requirements.airflow-business.txt /tmp/project12-build/requirements.txt
+# On copie uniquement les fichiers indiqués dans l’image ; le filtrage du contexte évite d’y
+# envoyer tout le projet.
+# On embarque les contraintes Airflow/Python qui encadrent la résolution de ces dépendances.
+COPY --chown=airflow:root constraints-airflow-3.3.2-python3.13.txt /tmp/project12-build/constraints.txt
+# On copie uniquement les fichiers indiqués dans l’image ; le filtrage du contexte évite d’y
+# envoyer tout le projet.
+# On ajoute le petit lanceur des essais Excel isolés ; il ne déclenche pas un scan du NAS.
+COPY --chown=airflow:root run_excel_tests_isolated.py /opt/project-test-tools/run_excel_tests_isolated.py
+# Le tag 3.3.2 reçu par l'utilisateur utilise Python 3.13 : refuser un autre Python.
+# On exécute cette opération pendant la construction de l’image, pas à chaque lancement d’un DAG.
+# On vérifie d’abord Python 3.13, puis on installe la version Airflow et les dépendances prévues.
+# La contrainte limite la résolution des versions ; pip check vérifie ensuite les dépendances déclarées.
+# Les && arrêtent cette chaîne si une étape précédente échoue pendant la construction.
+RUN python -c "import sys; assert sys.version_info[:2] == (3, 13), 'Image inattendue : Python 3.13 requis'" \
+    && pip install --no-cache-dir "apache-airflow==3.3.2" \
+       -r /tmp/project12-build/requirements.txt \
+       --constraint /tmp/project12-build/constraints.txt \
+    && pip check
