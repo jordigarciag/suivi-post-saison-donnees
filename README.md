@@ -1,5 +1,10 @@
 # Suivi post-saison des traitements et des livrables
 
+![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)
+![Docker](https://img.shields.io/badge/Docker-ready-2496ED.svg)
+![Airflow](https://img.shields.io/badge/Apache%20Airflow-enabled-017CEE.svg)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Data-336791.svg)
+
 ## Contexte
 
 Dans l’entreprise où j’ai réalisé mon alternance, des images de vignobles sont acquises puis traitées pour produire différents livrables. Le suivi des acquisitions est renseigné dans des fichiers Excel, tandis que les images et les résultats sont stockés sur un NAS.
@@ -47,11 +52,36 @@ L’absence d’un fichier ne signifie pas forcément qu’un livrable est en re
 | `app/` | Accès aux résultats et interface Dash |
 | `tests/`, `tests_browser/` | Tests du pipeline, des règles métier et de l’interface |
 
+*Note sur l'orchestration :* Le DAG principal du pipeline métier est `project12_eight_vineyards_business.py` (traitant un périmètre de 8 vignobles simulés). Les autres DAGs présents assurent les tests d'intégration (smoke tests, vérification des connexions) et la génération de l'environnement de démonstration.
+
 **Stack :** Python, pandas, openpyxl, PostgreSQL, Airflow, Docker, Dash et Plotly.
 
-## Essayer le dashboard
+## Déploiement de l'infrastructure complète (Docker & Airflow)
 
-Démonstration sur données fictives, sans NAS ni PostgreSQL : **5 vignobles, 50 acquisitions au dernier scan et 4 états historiques**. Les scans recensent successivement 25, 40, 45 puis 50 acquisitions. On peut observer des traitements qui progressent, des statuts Excel modifiés, des rattachements complétés et une erreur de lecture résolue. Quelques traitements restent incomplets et un contrôle reste impossible.
+L'ensemble de l'architecture est conteneurisé pour garantir sa reproductibilité locale avec des données simulées.
+
+### 1. Démarrer l'environnement
+Depuis la racine du projet, lancez la construction et le démarrage des services :
+```bash
+docker-compose up -d --build
+```
+
+### 2. Exécuter le pipeline métier
+1. Accédez à l'interface Airflow via `http://localhost:8080` (identifiants par défaut : `airflow` / `airflow`).
+2. Activez les DAGs techniques de préparation, puis lancez le DAG métier principal (`project12_eight_vineyards_business`). 
+3. Le pipeline va simuler le rapprochement entre les exports Excel et l'arborescence NAS virtuels, puis charger les résultats dans l'entrepôt PostgreSQL.
+
+### 3. Consulter les résultats
+Une fois le DAG terminé, le tableau de bord exploitant la base de données finalisée est accessible sur : `http://localhost:8050`.
+
+Pour éteindre proprement l'infrastructure :
+```bash
+docker-compose down
+```
+
+## Essayer le dashboard en mode local (sans Docker)
+
+Il est également possible de lancer uniquement l'interface Dash en local avec un jeu de données mocké en mémoire (**5 vignobles, 50 acquisitions au dernier scan et 4 états historiques**), sans nécessiter PostgreSQL ou Airflow. 
 
 Les exemples sont fixes : recharger la page ne tire pas de nouvelles valeurs au hasard. Les petits cas de tests des règles métier sont conservés séparément dans `tests/mock_fixture.py`. Depuis la racine du projet, avec Python 3.12 ou 3.13 et PowerShell :
 
@@ -61,20 +91,16 @@ python -m venv .venv
 $env:DASHBOARD_USE_MOCK = "1"
 .\.venv\Scripts\python.exe app/dash_app.py
 ```
+Le badge **DÉMONSTRATION** confirmera l’utilisation des données en mémoire sur l'adresse `http://127.0.0.1:8050`.
 
-Ouvrir `http://127.0.0.1:8050`. Le badge **DÉMONSTRATION** confirme l’utilisation des données fictives.
+## Vérifications et périmètre
 
-Pour les tests locaux :
-
+**851 tests locaux réussis**, ainsi que les deux scénarios navigateur, sur l’environnement Linux utilisé pour vérifier cette version. Cela ne remplace pas une validation du pipeline complet sur son infrastructure cible.
+    
+Pour lancer la suite de tests locaux :
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
 .\.venv\Scripts\python.exe -m pytest tests
 ```
 
-## Vérifications et périmètre
-
-**851 tests locaux réussis**, ainsi que les deux scénarios navigateur, sur l’environnement Linux utilisé pour vérifier cette version. Cela ne remplace pas une validation du pipeline complet sur son infrastructure cible.
-
-Ce dépôt présente le code du pipeline réalisé en entreprise, avec des exemples anonymisés. Le dashboard peut être essayé séparément sur des données fictives. L’exécution du pipeline complet nécessite des sources Excel et un stockage NAS compatibles, ainsi que la configuration de PostgreSQL et d’Airflow.
-
-Les noms de domaines et les exemples identifiants ont été anonymisés. Les données professionnelles, secrets et journaux d’exploitation ne sont pas inclus.
+Ce dépôt présente le code du pipeline réalisé en entreprise, expurgé et adapté. L’exécution en conditions réelles nécessite des sources Excel et un stockage NAS compatibles. Les noms de domaines et les exemples identifiants ont été strictement anonymisés. Les données professionnelles, secrets (`.env`) et journaux d’exploitation ne sont pas inclus.
